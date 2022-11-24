@@ -1,8 +1,9 @@
 package com.example.themoviemvvm.data.models
 
+import com.example.themoviemvvm.domain.models.Movie
 import com.google.gson.annotations.SerializedName
 
-data class MovieAPI(
+data class APIMovie(
     val id: Int,
 
     @SerializedName("poster_path")
@@ -29,4 +30,18 @@ data class MovieAPI(
     @SerializedName("vote_count")
     val voteCount: Int
 
-    )
+) {
+    fun toMovie() : Movie{
+        return Movie(
+            id = id,
+            posterPath = posterPath,
+            overview = overview,
+            originalTitle = originalTitle,
+            title = title,
+            backdropPath = backdropPath,
+            popularity = popularity,
+            voteAverage = voteAverage,
+            voteCount = voteCount
+        )
+    }
+}
