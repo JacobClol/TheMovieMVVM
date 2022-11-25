@@ -17,4 +17,5 @@ class UseCaseModule {
     fun provideGetPopularMoviesUseCase(
         popularMoviesRepository: PopularMoviesRepository
     ) = GetPopularMoviesUseCase(popularMoviesRepository)
+
 }

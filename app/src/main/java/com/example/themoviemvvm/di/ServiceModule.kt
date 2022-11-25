@@ -21,24 +21,9 @@ class ServiceModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient() = if (BuildConfig.DEBUG){
-        val loggingInterceptor = HttpLoggingInterceptor()
-        loggingInterceptor.level = HttpLoggingInterceptor.Level.HEADERS
-        loggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-        OkHttpClient.Builder()
-            .addInterceptor(loggingInterceptor)
-            .build()
-    } else {
-        OkHttpClient.Builder()
-            .build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideRetrofitService(client: OkHttpClient, gsonConverterFactory: GsonConverterFactory) : Retrofit{
+    fun provideRetrofitService(gsonConverterFactory: GsonConverterFactory) : Retrofit{
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(client)
             .addConverterFactory(gsonConverterFactory)
             .build()
     }

@@ -14,15 +14,15 @@ class MoviesAdapter(
     private val context: Context,
     private val listMovies: ArrayList<Movie>,
     private val movieClickListener: OnMovieClickListener
-): RecyclerView.Adapter<BaseViewHolder<*>>() {
+) : RecyclerView.Adapter<BaseViewHolder<*>>() {
 
     var movieFilterList = ArrayList<Movie>()
 
-    init{
+    init {
         movieFilterList = listMovies
     }
 
-    interface OnMovieClickListener{
+    interface OnMovieClickListener {
         fun onMovieClick(idMovie: Int)
     }
 
@@ -36,7 +36,7 @@ class MoviesAdapter(
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder<*>, position: Int) {
-        when(holder){
+        when (holder) {
             is MainViewHolder -> holder.bind(listMovies[position], position)
         }
     }
@@ -44,17 +44,23 @@ class MoviesAdapter(
     override fun getItemCount() = listMovies.size
 
     inner class MainViewHolder(private val binding: ItemRowMovieBinding) :
-            BaseViewHolder<Movie>(binding.root){
-                override fun bind(item: Movie, position: Int): Unit = with(binding){
-                    val urlImage = "https://image.tmdb.org/t/p/w500${item.posterPath}"
-                    Glide.with(context).load(urlImage).placeholder(R.drawable.load).into(thumbnail)
-                    title.text = item.title
-                    populatiry.text = item.popularity.toString()
-                    voteCount.text = item.voteCount.toString()
-                    rating.text = item.voteAverage.toString()
-                    itemView.setOnClickListener {
-                        movieClickListener.onMovieClick(item.id)
-                    }
-                }
+        BaseViewHolder<Movie>(binding.root) {
+        override fun bind(item: Movie, position: Int): Unit = with(binding) {
+            val urlImage = "https://image.tmdb.org/t/p/w500${item.posterPath}"
+            Glide.with(context).load(urlImage).placeholder(R.drawable.load).into(thumbnail)
+            title.text = item.title
+            populatiry.text = item.popularity.toString()
+            voteCount.text = item.voteCount.toString()
+            rating.text = item.voteAverage.toString()
+            itemView.setOnClickListener {
+                movieClickListener.onMovieClick(item.id)
             }
+        }
+    }
+
+    fun submitList(movies: Collection<Movie>){
+        listMovies.clear()
+        listMovies.addAll(movies)
+        notifyDataSetChanged()
+    }
 }

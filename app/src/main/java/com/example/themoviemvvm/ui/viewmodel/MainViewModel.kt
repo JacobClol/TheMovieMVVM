@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.themoviemvvm.BuildConfig
 import com.example.themoviemvvm.core.AbstractViewModel
 import com.example.themoviemvvm.core.CoroutinesContextProvider
-import com.example.themoviemvvm.core.ErrorProcessor
 import com.example.themoviemvvm.domain.models.Movie
 import com.example.themoviemvvm.domain.models.MovieParams
 import com.example.themoviemvvm.domain.usecases.GetPopularMoviesUseCase
@@ -16,13 +15,12 @@ import kotlinx.coroutines.withContext
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val coroutineContextProvider: CoroutinesContextProvider,
-    private val getPopularMoviesUseCase: GetPopularMoviesUseCase,
-    private val errorProcessor: ErrorProcessor
-) : AbstractViewModel<WorkplaceListScreenState>(WorkplaceListScreenState.Loading){
+    private val getPopularMoviesUseCase: GetPopularMoviesUseCase
+) : AbstractViewModel<MovieListScreenState>(MovieListScreenState.Loading){
 
     fun fechtPopularMovies(){
         viewModelScope.launch {
-            mutableState.value = WorkplaceListScreenState.Loading
+            mutableState.value = MovieListScreenState.Loading
             try {
                 val popularMovies = withContext(coroutineContextProvider.io){
                     getPopularMoviesUseCase(MovieParams(
@@ -37,12 +35,12 @@ class MainViewModel @Inject constructor(
     }
 
     private fun handleGetMoviesSuccess(list: List<Movie>){
-        mutableState.value = WorkplaceListScreenState.Success(list)
+        mutableState.value = MovieListScreenState.Success(list)
     }
 
     private fun handleGerMoviesError(e: Exception){
-       val movieError = errorProcessor.getErrorFromException(e)
-       mutableState.value = WorkplaceListScreenState.Failure(movieError)
+       val error = e.message ?: "Can't get the data"
+        mutableState.value = MovieListScreenState.Failure(error)
     }
 
     fun refresh(){

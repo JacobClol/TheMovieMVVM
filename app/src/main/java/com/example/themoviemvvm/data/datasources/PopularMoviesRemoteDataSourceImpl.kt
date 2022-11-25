@@ -10,6 +10,7 @@ class PopularMoviesRemoteDataSourceImpl @Inject constructor(
 ) : PopularMoviesRemoteDataSource {
 
     override suspend fun getPopularMovies(param: MovieParams): APIPopularMovieResults {
+        System.out.println("APYKEY ${param.apiKey}")
         return movieServices.getPopularMovies(
             param.apiKey,
             param.language,
