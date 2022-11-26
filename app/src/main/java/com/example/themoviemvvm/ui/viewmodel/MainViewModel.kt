@@ -7,6 +7,8 @@ import com.example.themoviemvvm.core.CoroutinesContextProvider
 import com.example.themoviemvvm.domain.models.Movie
 import com.example.themoviemvvm.domain.models.MovieParams
 import com.example.themoviemvvm.domain.usecases.GetPopularMoviesUseCase
+import com.example.themoviemvvm.domain.usecases.GetTopRateMoviesUseCase
+import com.example.themoviemvvm.ui.viewmodel.statesviewmodel.MovieListScreenState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -15,10 +17,11 @@ import kotlinx.coroutines.withContext
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val coroutineContextProvider: CoroutinesContextProvider,
-    private val getPopularMoviesUseCase: GetPopularMoviesUseCase
+    private val getPopularMoviesUseCase: GetPopularMoviesUseCase,
+    private val getTopRateMoviesUsecase: GetTopRateMoviesUseCase
 ) : AbstractViewModel<MovieListScreenState>(MovieListScreenState.Loading){
 
-    fun fechtPopularMovies(){
+    fun fetchPopularMovies(){
         viewModelScope.launch {
             mutableState.value = MovieListScreenState.Loading
             try {
@@ -28,6 +31,24 @@ class MainViewModel @Inject constructor(
                     ))
                 }
                 handleGetMoviesSuccess(popularMovies)
+            } catch (e: Exception){
+                handleGerMoviesError(e)
+            }
+        }
+    }
+
+    fun fetchTopRateMovies(){
+        viewModelScope.launch {
+            mutableState.value = MovieListScreenState.Loading
+            try {
+                val topRateMovies = withContext(coroutineContextProvider.io){
+                    getTopRateMoviesUsecase.invoke(
+                        MovieParams(
+                        apiKey = BuildConfig.MOVIE_API_KEY
+                    )
+                    )
+                }
+                handleGetMoviesSuccess(topRateMovies)
             } catch (e: Exception){
                 handleGerMoviesError(e)
             }
@@ -44,6 +65,6 @@ class MainViewModel @Inject constructor(
     }
 
     fun refresh(){
-        fechtPopularMovies()
+        fetchPopularMovies()
     }
 }

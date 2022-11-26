@@ -1,7 +1,9 @@
 package com.example.themoviemvvm.di
 
-import com.example.themoviemvvm.data.repositories.PopularMoviesRepositoryImpl
-import com.example.themoviemvvm.domain.repositories.PopularMoviesRepository
+import com.example.themoviemvvm.data.repositories.DetailMovieRepositoryImpl
+import com.example.themoviemvvm.data.repositories.GetMoviesRepositoryImpl
+import com.example.themoviemvvm.domain.repositories.DetailMovieRepository
+import com.example.themoviemvvm.domain.repositories.GetMoviesRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Reusable
@@ -15,6 +17,12 @@ abstract class RepositoryModule {
     @Binds
     @Reusable
     abstract fun bindPopularMoviesRepository(
-        popularMoviesRepositoryImpl: PopularMoviesRepositoryImpl
-    ): PopularMoviesRepository
+        getMoviesRepositoryImpl: GetMoviesRepositoryImpl
+    ): GetMoviesRepository
+
+    @Binds
+    @Reusable
+    abstract fun bindDetailMovieRepository(
+        detailMovieRepositoryImpl: DetailMovieRepositoryImpl
+    ) : DetailMovieRepository
 }

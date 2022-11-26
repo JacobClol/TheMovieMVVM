@@ -1,4 +1,4 @@
-package com.example.themoviemvvm.ui.viewmodel
+package com.example.themoviemvvm.ui.viewmodel.statesviewmodel
 
 import com.example.themoviemvvm.domain.models.Movie
 

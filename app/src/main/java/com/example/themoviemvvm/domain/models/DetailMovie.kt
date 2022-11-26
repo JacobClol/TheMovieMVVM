@@ -1,11 +1,9 @@
 package com.example.themoviemvvm.domain.models
 
-import com.example.themoviemvvm.data.models.GenresAPI
-
 data class DetailMovie(
     val id: Int,
     val backdropPath: String?,
-    val genres: List<GenresAPI>,
+    val genres: List<Genres>,
     val budget: Int,
     val originalLanguage: String,
     val originalTitle: String,

@@ -5,10 +5,10 @@ import com.example.themoviemvvm.domain.models.MovieParams
 import com.example.themoviemvvm.domain.repositories.GetMoviesRepository
 import javax.inject.Inject
 
-class GetPopularMoviesUseCase @Inject constructor(
+class GetTopRateMoviesUseCase @Inject constructor(
     private val getMoviesRepository: GetMoviesRepository
 ) {
     suspend operator fun invoke(params: MovieParams): List<Movie> {
-        return getMoviesRepository.getPopularMovies(params)
+        return getMoviesRepository.getTopRated(params)
     }
 }

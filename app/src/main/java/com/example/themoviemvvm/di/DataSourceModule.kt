@@ -1,7 +1,7 @@
 package com.example.themoviemvvm.di
 
-import com.example.themoviemvvm.data.datasources.PopularMoviesRemoteDataSource
-import com.example.themoviemvvm.data.datasources.PopularMoviesRemoteDataSourceImpl
+import com.example.themoviemvvm.data.datasources.MoviesRemoteDataSource
+import com.example.themoviemvvm.data.datasources.MoviesRemoteDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Reusable
@@ -15,6 +15,6 @@ abstract class DataSourceModule {
     @Binds
     @Reusable
     abstract fun bindPopularMoviesRemoteDataSource(
-        popularMoviesRemoteDataSourceImpl: PopularMoviesRemoteDataSourceImpl
-    ): PopularMoviesRemoteDataSource
+        popularMoviesRemoteDataSourceImpl: MoviesRemoteDataSourceImpl
+    ): MoviesRemoteDataSource
 }

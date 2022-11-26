@@ -3,7 +3,7 @@ package com.example.themoviemvvm.data.models
 import com.example.themoviemvvm.domain.models.Movie
 import com.google.gson.annotations.SerializedName
 
-data class APIPopularMovieResults(
+data class APIMovieResults(
     @SerializedName("results")
     val moviesList : List<APIMovie>
 ) {

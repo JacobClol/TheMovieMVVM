@@ -19,7 +19,7 @@ import com.example.themoviemvvm.databinding.FragmentMainBinding
 import com.example.themoviemvvm.domain.models.Movie
 import com.example.themoviemvvm.ui.adapter.MoviesAdapter
 import com.example.themoviemvvm.ui.viewmodel.MainViewModel
-import com.example.themoviemvvm.ui.viewmodel.MovieListScreenState
+import com.example.themoviemvvm.ui.viewmodel.statesviewmodel.MovieListScreenState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -59,12 +59,17 @@ class MainFragment : Fragment(), MoviesAdapter.OnMovieClickListener {
         lifecycleScope.launchWhenResumed {
             subscribeToMovieState()
         }
-        viewmodel.fechtPopularMovies()
+        viewmodel.fetchPopularMovies()
     }
 
     override fun onMovieClick(idMovie: Int) {
         val action = MainFragmentDirections.actionMainFragmentToDetailFragment(idMovie)
         findNavController().navigate(action)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setUpRecyclerView(){
