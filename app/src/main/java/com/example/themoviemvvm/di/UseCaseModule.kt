@@ -1,11 +1,14 @@
 package com.example.themoviemvvm.di
 
+import com.example.themoviemvvm.domain.repositories.DataLocalRepository
 import com.example.themoviemvvm.domain.repositories.DetailMovieRepository
 import com.example.themoviemvvm.domain.repositories.GetMoviesRepository
+import com.example.themoviemvvm.domain.usecases.DeleteFavoriteMovieUseCase
 import com.example.themoviemvvm.domain.usecases.GetDetailMovieUseCase
 import com.example.themoviemvvm.domain.usecases.GetPopularMoviesUseCase
 import com.example.themoviemvvm.domain.usecases.GetTopRateMoviesUseCase
 import com.example.themoviemvvm.domain.usecases.GetVideosMovieUseCase
+import com.example.themoviemvvm.domain.usecases.SaveFavoriteMovieUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.Reusable
@@ -39,4 +42,16 @@ class UseCaseModule {
     fun provideGetVideosMovieUseCase(
         detailMovieRepository: DetailMovieRepository
     ) = GetVideosMovieUseCase(detailMovieRepository)
+
+    @Provides
+    @Reusable
+    fun provideSaveMovieUseCase(
+        dataLocalRepository: DataLocalRepository
+    ) = SaveFavoriteMovieUseCase(dataLocalRepository)
+
+    @Provides
+    @Reusable
+    fun provideDeleteMovieUseCase(
+        dataLocalRepository: DataLocalRepository
+    ) = DeleteFavoriteMovieUseCase(dataLocalRepository)
 }

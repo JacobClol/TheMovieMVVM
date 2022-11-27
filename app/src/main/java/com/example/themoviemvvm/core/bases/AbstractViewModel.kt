@@ -1,4 +1,4 @@
-package com.example.themoviemvvm.core
+package com.example.themoviemvvm.core.bases
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.Flow

@@ -1,5 +1,10 @@
 package com.example.themoviemvvm.domain.models
 
+import android.os.Parcelable
+import com.example.themoviemvvm.data.models.DetailMovieEntity
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class DetailMovie(
     val id: Int,
     val backdropPath: String?,
@@ -15,5 +20,43 @@ data class DetailMovie(
     val video: Boolean,
     val voteAverage: Double,
     val homepage: String,
-    val voteCount: Int
-)
+    val voteCount: Int,
+    var thriller: String? = null,
+    var teaser: String? = null
+) : Parcelable {
+    fun toDetailMovieEntity(): DetailMovieEntity{
+        return DetailMovieEntity(
+            id = id,
+            backdropPath = backdropPath,
+            budget = budget,
+            originalLanguage = originalLanguage,
+            originalTitle = originalTitle,
+            title = title,
+            overview = overview,
+            popularity = popularity,
+            posterPath = posterPath,
+            releaseDate = releaseDate,
+            thriller = thriller,
+            teaser = teaser,
+            voteAverage = voteAverage,
+            homepage = homepage,
+            voteCount = voteCount,
+            video = video,
+            genres = genres
+        )
+    }
+
+    fun toMovie() : Movie {
+        return Movie(
+            id = id,
+            backdropPath = backdropPath,
+            overview = overview,
+            originalTitle = originalTitle,
+            title = title,
+            posterPath = posterPath,
+            popularity = popularity,
+            voteCount = voteCount,
+            voteAverage = voteAverage
+        )
+    }
+}

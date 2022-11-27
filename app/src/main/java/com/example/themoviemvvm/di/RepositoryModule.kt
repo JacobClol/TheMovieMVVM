@@ -1,7 +1,9 @@
 package com.example.themoviemvvm.di
 
+import com.example.themoviemvvm.data.repositories.DataLocalRepositoryImpl
 import com.example.themoviemvvm.data.repositories.DetailMovieRepositoryImpl
 import com.example.themoviemvvm.data.repositories.GetMoviesRepositoryImpl
+import com.example.themoviemvvm.domain.repositories.DataLocalRepository
 import com.example.themoviemvvm.domain.repositories.DetailMovieRepository
 import com.example.themoviemvvm.domain.repositories.GetMoviesRepository
 import dagger.Binds
@@ -25,4 +27,10 @@ abstract class RepositoryModule {
     abstract fun bindDetailMovieRepository(
         detailMovieRepositoryImpl: DetailMovieRepositoryImpl
     ) : DetailMovieRepository
+
+    @Binds
+    @Reusable
+    abstract fun bindDataLocalRepository(
+        dataLocalRepositoryImpl: DataLocalRepositoryImpl
+    ) : DataLocalRepository
 }

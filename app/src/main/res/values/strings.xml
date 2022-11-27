@@ -20,8 +20,12 @@
     <string name="home_page">Home Page</string>
     <string name="trailler">See Trailler</string>
     <string name="teaser">See Teaser</string>
-    <string name="action_movies_saved">The movies saved</string>
     <string name="popularity">Popularity:</string>
     <string name="vote_count">Vote Count:</string>
     <string name="rate">Rate:</string>
+    <string name="get_top_rate">Get the top rate</string>
+    <string name="order_by_popularity">Order by popularity</string>
+    <string name="order_by_high_vote">Order by high vote</string>
+    <string name="order_by_rate">Order by rate</string>
+    <string name="top_rate">Top Rate</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.example.themoviemvvm.core
+package com.example.themoviemvvm.core.utils
 
 import kotlin.coroutines.CoroutineContext
 

@@ -13,4 +13,6 @@ sealed class MovieScreenState {
 
     class SuccessVideo(val video: List<Video>) : MovieScreenState()
 
+    class SaveMovie(val msg: String) : MovieScreenState()
+
 }

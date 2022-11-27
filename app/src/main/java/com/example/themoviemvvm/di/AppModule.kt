@@ -1,17 +1,36 @@
 package com.example.themoviemvvm.di
 
-import com.example.themoviemvvm.core.CoroutinesContextProvider
+import android.content.Context
+import androidx.room.Room
+import com.example.themoviemvvm.core.utils.CoroutinesContextProvider
+import com.example.themoviemvvm.data.db.AppDataBase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Singleton
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
 
 @Module
 @InstallIn(SingletonComponent::class)
 class AppModule {
+
+    @Provides
+    @Singleton
+    fun provideDatabase(
+        @ApplicationContext context: Context
+    ) = Room.databaseBuilder(
+        context,
+        AppDataBase::class.java,
+        MOVIE_DATABASE_NAME
+    ).build()
+
+    @Provides
+    @Singleton
+    fun provideDao(dataBase: AppDataBase) = dataBase.movieDao()
 
     @Provides
     fun provideContextProvider(): CoroutinesContextProvider {
@@ -42,3 +61,5 @@ class AppModule {
 
     var isRunningTest: AtomicBoolean? = null
 }
+
+private const val MOVIE_DATABASE_NAME = "movie_table"

@@ -15,7 +15,10 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.example.themoviemvvm.R
+import com.example.themoviemvvm.core.utils.NetworkState
 import com.example.themoviemvvm.databinding.FragmentMainBinding
+import com.example.themoviemvvm.domain.models.DetailMovie
 import com.example.themoviemvvm.domain.models.Movie
 import com.example.themoviemvvm.ui.adapter.MoviesAdapter
 import com.example.themoviemvvm.ui.viewmodel.MainViewModel
@@ -32,11 +35,11 @@ class MainFragment : Fragment(), MoviesAdapter.OnMovieClickListener {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
 
-    private val listMovie: ArrayList<Movie> = ArrayList()
+    private val listFavoriteMovie: ArrayList<DetailMovie> = ArrayList()
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
-
+    private var isSelectListFavorite = false
     private val adapter by lazy {
-        MoviesAdapter(requireContext(), listMovie, this)
+        MoviesAdapter(requireContext(), this)
     }
 
     override fun onCreateView(
@@ -50,20 +53,29 @@ class MainFragment : Fragment(), MoviesAdapter.OnMovieClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val navController = findNavController()
-        val appBarConfiguration = AppBarConfiguration(navController.graph)
-        binding.toolbar.setupWithNavController(navController, appBarConfiguration)
-
         setUpRecyclerView()
         setupSwipeRefreshLayout()
+        initToolbar()
         lifecycleScope.launchWhenResumed {
             subscribeToMovieState()
         }
-        viewmodel.fetchPopularMovies()
+        if (NetworkState.isNetworkConnected && !isSelectListFavorite){
+            viewmodel.fetchPopularMovies()
+        } else {
+            viewmodel.fetchFavoriteMovies()
+        }
     }
 
     override fun onMovieClick(idMovie: Int) {
         val action = MainFragmentDirections.actionMainFragmentToDetailFragment(idMovie)
+        findNavController().navigate(action)
+    }
+
+    override fun onFavoriteClick(position: Int){
+        val action = MainFragmentDirections.actionMainFragmentToDetailFragment(
+            listFavoriteMovie[position].id,
+            listFavoriteMovie[position]
+        )
         findNavController().navigate(action)
     }
 
@@ -72,8 +84,8 @@ class MainFragment : Fragment(), MoviesAdapter.OnMovieClickListener {
         _binding = null
     }
 
-    private fun setUpRecyclerView(){
-        if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT){
+    private fun setUpRecyclerView() {
+        if (requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             binding.rvListMovies.layoutManager = GridLayoutManager(context, 2)
         } else {
             binding.rvListMovies.layoutManager = GridLayoutManager(context, 4)
@@ -82,12 +94,12 @@ class MainFragment : Fragment(), MoviesAdapter.OnMovieClickListener {
         binding.rvListMovies.adapter = adapter
     }
 
-    private fun subscribeToMovieState(){
+    private fun subscribeToMovieState() {
         viewmodel.state.onEach(::handleMovieListState).launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
-    private fun handleMovieListState(screenState: MovieListScreenState){
-        when(screenState){
+    private fun handleMovieListState(screenState: MovieListScreenState) {
+        when (screenState) {
             is MovieListScreenState.Success -> {
                 hideProgressBar()
                 hideRefreshing()
@@ -101,11 +113,24 @@ class MainFragment : Fragment(), MoviesAdapter.OnMovieClickListener {
             is MovieListScreenState.Loading -> {
                 binding.progressBar.visibility = View.VISIBLE
             }
+            is MovieListScreenState.SuccessFavorite -> {
+                hideProgressBar()
+                hideRefreshing()
+                showFavoriteMovies(screenState.data)
+            }
         }
     }
 
     private fun showMovies(data: List<Movie>) {
+        isSelectListFavorite = false
         adapter.submitList(data)
+    }
+
+    private fun showFavoriteMovies(list: List<DetailMovie>){
+        isSelectListFavorite = true
+        listFavoriteMovie.addAll(list)
+        val listMovie = list.map { it.toMovie() }
+        adapter.submitListFavorite(listMovie)
     }
 
     private fun showError(error: String) {
@@ -119,11 +144,46 @@ class MainFragment : Fragment(), MoviesAdapter.OnMovieClickListener {
         }
     }
 
-    private fun hideProgressBar(){
+    private fun hideProgressBar() {
         binding.progressBar.visibility = View.GONE
     }
 
-    private fun hideRefreshing(){
+    private fun hideRefreshing() {
         binding.swipeRefreshLayout.isRefreshing = false
+    }
+
+    private fun initToolbar() {
+        val navController = findNavController()
+        val appBarConfiguration = AppBarConfiguration(navController.graph)
+        with(binding) {
+            toolbar.setupWithNavController(navController, appBarConfiguration)
+            toolbar.inflateMenu(R.menu.main)
+            toolbar.setOnMenuItemClickListener {
+                when(it.itemId){
+                    R.id.action_favorite ->{
+                        viewmodel.fetchFavoriteMovies()
+                        true
+                    }
+                    R.id.action_top_rate -> {
+                        viewmodel.fetchTopRateMovies()
+                        true
+                    }
+                    R.id.action_popularity -> {
+                        adapter.orderByPopularity()
+                        true
+                    }
+                    R.id.action_rate -> {
+                        adapter.orderByRate()
+                        true
+                    }
+                    R.id.action_votes -> {
+                        adapter.orderByVote()
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }
+
     }
 }

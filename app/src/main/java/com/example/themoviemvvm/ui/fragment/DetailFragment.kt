@@ -4,9 +4,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -38,7 +40,8 @@ class DetailFragment : Fragment(), AppBarLayout.OnOffsetChangedListener, View.On
     private var scrollRange = -1
     private var isShow = false
     private val args: DetailFragmentArgs by navArgs()
-    private lateinit var _movie : DetailMovie
+    private lateinit var _movie: DetailMovie
+    private var isSaveLikeFavorite = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,10 +54,8 @@ class DetailFragment : Fragment(), AppBarLayout.OnOffsetChangedListener, View.On
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val navController = findNavController()
-        val appBarConfiguration = AppBarConfiguration(navController.graph)
-        binding.toolbar.setupWithNavController(navController, appBarConfiguration)
         initCollapsingToolbar()
+
         lifecycleScope.launchWhenResumed {
             subscribeToMovieState()
         }
@@ -62,7 +63,11 @@ class DetailFragment : Fragment(), AppBarLayout.OnOffsetChangedListener, View.On
         binding.txHomePage.setOnClickListener(this)
         binding.bnTeaser.setOnClickListener(this)
         binding.bnTrailler.setOnClickListener(this)
-        viewmodel.fetchDetailMovie(args.idMovie)
+
+        args.detailMovie?.let {
+            isSaveLikeFavorite = true
+            setMovie(it)
+        } ?: viewmodel.fetchDetailMovie(args.idMovie)
     }
 
     override fun onOffsetChanged(appBarLayout: AppBarLayout?, verticalOffset: Int) {
@@ -70,7 +75,7 @@ class DetailFragment : Fragment(), AppBarLayout.OnOffsetChangedListener, View.On
             scrollRange = appBarLayout?.totalScrollRange ?: -1
         }
         if (scrollRange + verticalOffset == 0) {
-            binding.collapsingToolbar.title = getString(R.string.app_name)
+            binding.collapsingToolbar.title = _movie.originalTitle
             isShow = true
         } else {
             binding.collapsingToolbar.title = ""
@@ -118,6 +123,10 @@ class DetailFragment : Fragment(), AppBarLayout.OnOffsetChangedListener, View.On
                 hideProgressBar()
                 setVideos(screenState.video)
             }
+            is MovieScreenState.SaveMovie -> {
+                hideProgressBar()
+                showMessage(screenState.msg)
+            }
         }
     }
 
@@ -129,6 +138,10 @@ class DetailFragment : Fragment(), AppBarLayout.OnOffsetChangedListener, View.On
         Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show()
     }
 
+    private fun showMessage(error: String) {
+        isSaveLikeFavorite = !isSaveLikeFavorite
+        Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show()
+    }
 
     private fun setMovie(movie: DetailMovie) {
         with(binding) {
@@ -144,15 +157,15 @@ class DetailFragment : Fragment(), AppBarLayout.OnOffsetChangedListener, View.On
             txOriginalTitle.text = movie.originalTitle
             txLanguage.text = movie.originalLanguage
             _movie = movie
-            viewmodel.fetchVideoMovie(args.idMovie)
+            viewmodel.fetchVideoMovie(movie.id)
         }
     }
 
     private fun setVideos(video: List<Video>) {
-        if (video.isNotEmpty()){
-            for (item in video){
-                if (item.site == "YouTube"){
-                    when(item.type){
+        if (video.isNotEmpty()) {
+            for (item in video) {
+                if (item.site == "YouTube") {
+                    when (item.type) {
                         "Trailer" -> {
                             binding.bnTrailler.visibility = View.VISIBLE
                             urlTriller = "https://www.youtube.com/watch?v=${item.key}"
@@ -168,13 +181,52 @@ class DetailFragment : Fragment(), AppBarLayout.OnOffsetChangedListener, View.On
                     }
                 }
             }
+            _movie.thriller = urlTriller
+            _movie.teaser = urlTeaser
         }
     }
 
     private fun initCollapsingToolbar() {
-        binding.collapsingToolbar.title = ""
-        binding.appBar.setExpanded(true)
         binding.appBar.addOnOffsetChangedListener(this)
+        val navController = findNavController()
+        val appBarConfiguration = AppBarConfiguration(navController.graph)
+
+        with(binding) {
+            collapsingToolbar.title = ""
+            appBar.setExpanded(true)
+            toolbar.inflateMenu(R.menu.favorite_detail)
+            collapsingToolbar.setupWithNavController(binding.toolbar, navController, appBarConfiguration)
+        }
+
+        setMenuItemListener()
+    }
+
+    private fun setMenuItemListener() {
+        binding.toolbar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.action_favorite -> {
+                    saveFavoriteMovie(it)
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    private fun saveFavoriteMovie(item: MenuItem) {
+        setIconByIsFavorite(item)
+        viewmodel.saveOrDeleteFavoriteMovie(isSaveLikeFavorite, _movie)
+    }
+
+    private fun setIconByIsFavorite(item: MenuItem) {
+        val favorite = ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite)
+        val unFavorite =
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_border)
+        if (isSaveLikeFavorite) {
+            item.icon = unFavorite
+        } else {
+            item.icon = favorite
+        }
     }
 
     private fun openIntenActionView(url: String) {

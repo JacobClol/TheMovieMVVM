@@ -1,4 +1,4 @@
-package com.example.themoviemvvm.core
+package com.example.themoviemvvm.core.bases
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView

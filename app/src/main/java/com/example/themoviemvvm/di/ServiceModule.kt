@@ -17,13 +17,30 @@ import retrofit2.converter.gson.GsonConverterFactory
 class ServiceModule {
 
     @Provides
+    @Singleton
     fun provideGsonConvertFactory() : GsonConverterFactory = GsonConverterFactory.create()
+
+    @Singleton
+    @Provides
+    fun providesHttpLoggingInterceptor() = HttpLoggingInterceptor()
+        .apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+    @Singleton
+    @Provides
+    fun providesOkHttpClient(httpLoggingInterceptor: HttpLoggingInterceptor): OkHttpClient =
+        OkHttpClient
+            .Builder()
+            .addInterceptor(httpLoggingInterceptor)
+            .build()
 
     @Provides
     @Singleton
-    fun provideRetrofitService(gsonConverterFactory: GsonConverterFactory) : Retrofit{
+    fun provideRetrofitService(okHttpClient: OkHttpClient, gsonConverterFactory: GsonConverterFactory) : Retrofit{
         return Retrofit.Builder()
             .baseUrl(BASE_URL)
+            .client(okHttpClient)
             .addConverterFactory(gsonConverterFactory)
             .build()
     }

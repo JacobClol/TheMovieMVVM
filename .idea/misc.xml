@@ -7,13 +7,15 @@
         <entry key="app/src/main/res/drawable-v24/ic_favorite_border.xml" value="0.1" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_baseline_local_movies_24.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/ic_favorite.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/ic_launcher_foreground.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.26902173913043476" />
         <entry key="app/src/main/res/layout/fragment_detail.xml" value="0.26902173913043476" />
         <entry key="app/src/main/res/layout/fragment_main.xml" value="0.1" />
         <entry key="app/src/main/res/layout/item_row_movie.xml" value="0.26902173913043476" />
-        <entry key="app/src/main/res/menu/main.xml" value="0.34739583333333335" />
+        <entry key="app/src/main/res/menu/favorite_detail.xml" value="0.34739583333333335" />
+        <entry key="app/src/main/res/menu/main.xml" value="0.21787709497206703" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" value="0.1" />
       </map>
     </option>
