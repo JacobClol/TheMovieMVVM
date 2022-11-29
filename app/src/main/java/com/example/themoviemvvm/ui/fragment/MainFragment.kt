@@ -59,7 +59,7 @@ class MainFragment : Fragment(), MoviesAdapter.OnMovieClickListener {
         lifecycleScope.launchWhenResumed {
             subscribeToMovieState()
         }
-        if (NetworkState.isNetworkConnected && !isSelectListFavorite){
+        if (!isSelectListFavorite){
             viewmodel.fetchPopularMovies()
         } else {
             viewmodel.fetchFavoriteMovies()

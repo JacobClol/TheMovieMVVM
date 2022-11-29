@@ -7,10 +7,10 @@ sealed class MovieListScreenState {
 
     object Loading : MovieListScreenState()
 
-    class Success(val data:List<Movie>): MovieListScreenState()
+    class Success(val data: List<Movie>) : MovieListScreenState()
 
-    class SuccessFavorite(val data:List<DetailMovie>): MovieListScreenState()
+    class SuccessFavorite(val data: List<DetailMovie>) : MovieListScreenState()
 
-    class Failure(val error: String): MovieListScreenState()
+    class Failure(val error: String) : MovieListScreenState()
 
 }

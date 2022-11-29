@@ -21,8 +21,9 @@ data class DetailMovie(
     val voteAverage: Double,
     val homepage: String,
     val voteCount: Int,
-    var thriller: String? = null,
-    var teaser: String? = null
+    var trailer: String? = null,
+    var teaser: String? = null,
+    var isFavorite: Boolean = false
 ) : Parcelable {
     fun toDetailMovieEntity(): DetailMovieEntity{
         return DetailMovieEntity(
@@ -36,13 +37,14 @@ data class DetailMovie(
             popularity = popularity,
             posterPath = posterPath,
             releaseDate = releaseDate,
-            thriller = thriller,
+            trailer = trailer,
             teaser = teaser,
             voteAverage = voteAverage,
             homepage = homepage,
             voteCount = voteCount,
             video = video,
-            genres = genres
+            genres = genres,
+            isFavorite = isFavorite
         )
     }
 

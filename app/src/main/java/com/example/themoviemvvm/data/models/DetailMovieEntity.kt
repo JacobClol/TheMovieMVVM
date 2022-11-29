@@ -38,8 +38,8 @@ data class DetailMovieEntity(
     @ColumnInfo(name = "release_date")
     val releaseDate: String,
 
-    @ColumnInfo(name = "thriller")
-    val thriller: String?,
+    @ColumnInfo(name = "trailer")
+    val trailer: String?,
 
     @ColumnInfo(name = "teaser")
     val teaser: String?,
@@ -57,7 +57,10 @@ data class DetailMovieEntity(
     val genres: List<Genres>,
 
     @ColumnInfo(name = "video")
-    val video: Boolean
+    val video: Boolean,
+
+    @ColumnInfo(name = "is_favorite")
+    val isFavorite: Boolean
 ){
     fun toDetailMovie(): DetailMovie{
         return DetailMovie(
@@ -70,14 +73,15 @@ data class DetailMovieEntity(
             overview = overview,
             popularity = popularity,
             releaseDate = releaseDate,
-            thriller = thriller,
+            trailer = trailer,
             teaser = teaser,
             voteAverage = voteAverage,
             homepage = homepage,
             voteCount = voteCount,
             posterPath = posterPath,
             genres = genres,
-            video = video
+            video = video,
+            isFavorite = isFavorite
         )
     }
 }

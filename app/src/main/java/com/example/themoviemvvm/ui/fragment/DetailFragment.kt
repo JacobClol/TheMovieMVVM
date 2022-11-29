@@ -35,13 +35,13 @@ class DetailFragment : Fragment(), AppBarLayout.OnOffsetChangedListener, View.On
     private var _binding: FragmentDetailBinding? = null
     private val binding get() = _binding!!
 
-    private var urlTriller = ""
+    private var urlTrailer = ""
     private var urlTeaser = ""
     private var scrollRange = -1
     private var isShow = false
     private val args: DetailFragmentArgs by navArgs()
     private lateinit var _movie: DetailMovie
-    private var isSaveLikeFavorite = false
+    private var isFavorite = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,10 +64,7 @@ class DetailFragment : Fragment(), AppBarLayout.OnOffsetChangedListener, View.On
         binding.bnTeaser.setOnClickListener(this)
         binding.bnTrailler.setOnClickListener(this)
 
-        args.detailMovie?.let {
-            isSaveLikeFavorite = true
-            setMovie(it)
-        } ?: viewmodel.fetchDetailMovie(args.idMovie)
+        viewmodel.initDetailMovie(args.idMovie, args.detailMovie)
     }
 
     override fun onOffsetChanged(appBarLayout: AppBarLayout?, verticalOffset: Int) {
@@ -86,7 +83,7 @@ class DetailFragment : Fragment(), AppBarLayout.OnOffsetChangedListener, View.On
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.bnTrailler -> {
-                openIntenActionView(urlTriller)
+                openIntenActionView(urlTrailer)
             }
             R.id.bnTeaser -> {
                 openIntenActionView(urlTeaser)
@@ -127,6 +124,9 @@ class DetailFragment : Fragment(), AppBarLayout.OnOffsetChangedListener, View.On
                 hideProgressBar()
                 showMessage(screenState.msg)
             }
+            is MovieScreenState.SetVideoLocal -> {
+                showBtnVideos()
+            }
         }
     }
 
@@ -139,12 +139,13 @@ class DetailFragment : Fragment(), AppBarLayout.OnOffsetChangedListener, View.On
     }
 
     private fun showMessage(error: String) {
-        isSaveLikeFavorite = !isSaveLikeFavorite
+        isFavorite = !isFavorite
         Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show()
     }
 
     private fun setMovie(movie: DetailMovie) {
         with(binding) {
+            isFavorite = movie.isFavorite
             val urlImage = "https://image.tmdb.org/t/p/w500${movie.posterPath}"
             Glide.with(requireContext()).load(urlImage).placeholder(R.drawable.load)
                 .into(thumbnailImageheader)
@@ -157,7 +158,8 @@ class DetailFragment : Fragment(), AppBarLayout.OnOffsetChangedListener, View.On
             txOriginalTitle.text = movie.originalTitle
             txLanguage.text = movie.originalLanguage
             _movie = movie
-            viewmodel.fetchVideoMovie(movie.id)
+            setInitIconMovieSave(binding.toolbar.menu.findItem(R.id.action_favorite))
+            viewmodel.fetchVideoMovie(movie.id, isFavorite)
         }
     }
 
@@ -167,23 +169,33 @@ class DetailFragment : Fragment(), AppBarLayout.OnOffsetChangedListener, View.On
                 if (item.site == "YouTube") {
                     when (item.type) {
                         "Trailer" -> {
-                            binding.bnTrailler.visibility = View.VISIBLE
-                            urlTriller = "https://www.youtube.com/watch?v=${item.key}"
+                            _movie.trailer = "https://www.youtube.com/watch?v=${item.key}"
                         }
                         "Teaser" -> {
-                            binding.bnTeaser.visibility = View.VISIBLE
-                            urlTeaser = "https://www.youtube.com/watch?v=${item.key}"
+                            _movie.teaser = "https://www.youtube.com/watch?v=${item.key}"
                         }
                         else -> {
-                            binding.bnTrailler.visibility = View.GONE
-                            binding.bnTeaser.visibility = View.GONE
+                           hideTeaser()
                         }
                     }
+                    showBtnVideos()
                 }
             }
-            _movie.thriller = urlTriller
-            _movie.teaser = urlTeaser
         }
+    }
+
+    private fun showBtnVideos(){
+        _movie.trailer?.let {
+            binding.bnTrailler.visibility = View.VISIBLE
+        }
+        _movie.teaser?.let {
+            binding.bnTeaser.visibility = View.VISIBLE
+        }
+    }
+
+    private fun hideTeaser(){
+        binding.bnTrailler.visibility = View.GONE
+        binding.bnTeaser.visibility = View.GONE
     }
 
     private fun initCollapsingToolbar() {
@@ -215,17 +227,28 @@ class DetailFragment : Fragment(), AppBarLayout.OnOffsetChangedListener, View.On
 
     private fun saveFavoriteMovie(item: MenuItem) {
         setIconByIsFavorite(item)
-        viewmodel.saveOrDeleteFavoriteMovie(isSaveLikeFavorite, _movie)
+        viewmodel.saveOrDeleteFavoriteMovie(_movie)
     }
 
     private fun setIconByIsFavorite(item: MenuItem) {
         val favorite = ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite)
         val unFavorite =
             ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_border)
-        if (isSaveLikeFavorite) {
+        if (isFavorite) {
             item.icon = unFavorite
         } else {
             item.icon = favorite
+        }
+    }
+
+    private fun setInitIconMovieSave(item: MenuItem){
+        val favorite = ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite)
+        val unFavorite =
+            ContextCompat.getDrawable(requireContext(), R.drawable.ic_favorite_border)
+        if (isFavorite) {
+            item.icon = favorite
+        } else {
+            item.icon = unFavorite
         }
     }
 

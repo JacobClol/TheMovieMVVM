@@ -14,35 +14,35 @@ class MoviesRemoteDataSourceImpl @Inject constructor(
 
     override suspend fun getPopularMovies(params: MovieParams): APIMovieResults {
         return movieServices.getPopularMovies(
-            params.apiKey,
-            params.language,
-            params.page,
-            params.region
+            apiKey = params.apiKey,
+            language = params.language,
+            page = params.page,
+            region = params.region
         )
     }
 
     override suspend fun getTopRateMovies(params: MovieParams): APIMovieResults {
         return movieServices.getTopRateMovies(
-            params.apiKey,
-            params.language,
-            params.page,
-            params.region
+            apiKey = params.apiKey,
+            language = params.language,
+            page = params.page,
+            region = params.region
         )
     }
 
     override suspend fun getDetailMovie(params: DetailMovieParams): DetailMovieAPI {
         return movieServices.getDetailMovie(
-            params.idMovie,
-            params.apiKey,
-            params.language
+            idMovie = params.idMovie,
+            apiKey = params.apiKey,
+            language = params.language
         )
     }
 
     override suspend fun getVideoMovie(params: DetailMovieParams): VideoMovieAPI {
         return movieServices.getVideoMovie(
-            params.idMovie,
-            params.apiKey,
-            params.language
+            idMovie = params.idMovie,
+            apiKey = params.apiKey,
+            language = params.language
         )
     }
 }

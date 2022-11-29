@@ -24,74 +24,91 @@ class DetailViewModel @Inject constructor(
     private val getVideoMovieUseCase: GetVideosMovieUseCase,
     private val saveFavoriteMovieUseCase: SaveFavoriteMovieUseCase,
     private val deleteFavoriteMovieUseCase: DeleteFavoriteMovieUseCase
-) : AbstractViewModel<MovieScreenState>(MovieScreenState.Loading){
-    
-    fun fetchDetailMovie(idMovie: Int){
-        viewModelScope.launch { 
+) : AbstractViewModel<MovieScreenState>(MovieScreenState.Loading) {
+
+    fun initDetailMovie(idMovie: Int, movie: DetailMovie?) {
+        if (movie != null) {
+            handleGetMoviesSuccess(movie)
+        } else {
+            fetchDetailMovie(idMovie)
+        }
+    }
+
+    private fun fetchDetailMovie(idMovie: Int) {
+        viewModelScope.launch {
             mutableState.value = MovieScreenState.Loading
             try {
-                val detailMovie = withContext(courutineContextProvider.io){
-                    getDetailMovieUseCase(DetailMovieParams(
-                        idMovie = idMovie,
-                        apiKey = BuildConfig.MOVIE_API_KEY
-                    ))
+                val detailMovie = withContext(courutineContextProvider.io) {
+                    getDetailMovieUseCase(
+                        DetailMovieParams(
+                            idMovie = idMovie,
+                            apiKey = BuildConfig.MOVIE_API_KEY
+                        )
+                    )
                 }
                 handleGetMoviesSuccess(detailMovie)
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 handleMoviesError(e)
             }
         }
     }
 
-    fun fetchVideoMovie(idMovie: Int){
-        viewModelScope.launch {
-            mutableState.value = MovieScreenState.Loading
-            try{
-                val videoMovie = withContext(courutineContextProvider.io){
-                    getVideoMovieUseCase(DetailMovieParams(
-                        idMovie = idMovie,
-                        apiKey = BuildConfig.MOVIE_API_KEY
-                    ))
+    fun fetchVideoMovie(idMovie: Int, isFavorite: Boolean) {
+        if (isFavorite) {
+            mutableState.value = MovieScreenState.SetVideoLocal
+        } else {
+            viewModelScope.launch {
+                mutableState.value = MovieScreenState.Loading
+                try {
+                    val videoMovie = withContext(courutineContextProvider.io) {
+                        getVideoMovieUseCase(
+                            DetailMovieParams(
+                                idMovie = idMovie,
+                                apiKey = BuildConfig.MOVIE_API_KEY
+                            )
+                        )
+                    }
+                    handleGetVideosMovieSuccess(videoMovie)
+                } catch (e: Exception) {
+                    handleMoviesError(e)
                 }
-                handleGetVideosMovieSuccess(videoMovie)
-            } catch (e: Exception){
-                handleMoviesError(e)
             }
         }
     }
 
-    fun saveOrDeleteFavoriteMovie(save: Boolean, movie: DetailMovie){
+    fun saveOrDeleteFavoriteMovie(movie: DetailMovie) {
         viewModelScope.launch {
             mutableState.value = MovieScreenState.Loading
             try {
-               val result = withContext(courutineContextProvider.io){
-                    if (save){
+                val result = withContext(courutineContextProvider.io) {
+                    if (movie.isFavorite) {
                         deleteFavoriteMovieUseCase(movie)
                     } else {
+                        movie.isFavorite = true
                         saveFavoriteMovieUseCase(movie)
                     }
                 }
                 handleSaveMovie(result)
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 handleMoviesError(e)
             }
         }
     }
 
-    private fun handleGetMoviesSuccess(movie: DetailMovie){
+    private fun handleGetMoviesSuccess(movie: DetailMovie) {
         mutableState.value = MovieScreenState.Success(movie)
     }
 
-    private fun handleGetVideosMovieSuccess(videos: List<Video>){
+    private fun handleGetVideosMovieSuccess(videos: List<Video>) {
         mutableState.value = MovieScreenState.SuccessVideo(videos)
     }
 
-    private fun handleMoviesError(e: Exception){
+    private fun handleMoviesError(e: Exception) {
         val error = e.message ?: "Can't get the data try again"
         mutableState.value = MovieScreenState.Failure(error)
     }
 
-    private fun handleSaveMovie(msg: String){
+    private fun handleSaveMovie(msg: String) {
         mutableState.value = MovieScreenState.SaveMovie(msg)
     }
 }

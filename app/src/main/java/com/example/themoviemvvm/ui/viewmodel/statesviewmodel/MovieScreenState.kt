@@ -15,4 +15,6 @@ sealed class MovieScreenState {
 
     class SaveMovie(val msg: String) : MovieScreenState()
 
+    object SetVideoLocal : MovieScreenState()
+
 }
